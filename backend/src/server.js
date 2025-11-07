@@ -1,10 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
+import { connectDB } from "./lib/db.js";
 dotenv.config({
   path:'./.env'
 });
-
-
 const app = express();
 
 app.get("/", (req, res) => {
@@ -13,8 +12,15 @@ app.get("/", (req, res) => {
   });
 }); 
 
+const startServer = async () => {
+  try {
+    await connectDB();
+      app.listen(process.env.PORT, () => {  
+        console.log("⚙ Server is runnig port: ",process.env.PORT )
+      });
+  } catch (error) {
+    console.log("Error while starting the server!", error);
+  }
+}
 
-
-app.listen(process.env.PORT, () => {
-  console.log("Server is running on port "+ process.env.PORT);
-});
+startServer();
