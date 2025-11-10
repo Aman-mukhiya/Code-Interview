@@ -8,7 +8,8 @@ const syncUser = inngest.createFunction(
     {id:"sync-user"},
     {event:"clerk/user.created"},
     async({event}) => {
-        await connectDB()
+       try {
+         await connectDB()
         const {id, email_addresses, first_name, last_name, image_url} = event.data
         const newUser = {
             clerkId: id,
@@ -17,6 +18,9 @@ const syncUser = inngest.createFunction(
             profileImage:image_url
         }
         await User.create(newUser)
+       } catch (error) {
+        console.error("Something went while creating the user!", error);
+       }
     }
 )
 
@@ -25,9 +29,13 @@ const deleteUserFromDB = inngest.createFunction(
     {event:"clerk/user.deleted"},
 
     async({event}) => {
-        await connectDB()
+       try {
+         await connectDB()
         const {id} = event.data
         await User.deleteOne({clerkId: id});
+       } catch (error) {
+        console.error("Somegthing went wrong while deleting the user", error);
+       }
     }
 )
 
